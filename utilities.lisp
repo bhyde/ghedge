@@ -54,11 +54,18 @@
    (google-api-request :docs "http://docs.google.com/feeds/default/private/full")
    (cxml-xmls:make-xmls-builder)))
 
-(defvar *id* "spreadsheet:0An7BccZWZ_lgdHpBN0hna0tZNWY3b3ZhRkVQcDdSS3c")
-
 (defun google-fetch-csv (doc-id)
   (google-api-request
    :spreadsheets
    "http://spreadsheets.google.com/feeds/download/spreadsheets/Export"
    :parameters `(("key" . ,doc-id )
                  ("exportFormat" . "csv"))))
+
+#+nil ;; there are apparently bugs a plenty in PUT of a text/cvs ... so damn.
+(defun google-put-csv (doc-id csv)
+  (google-api-request
+   :spreadsheets
+   (format nil "http://spreadsheets.google.com/feeds/media/private/full/spreadsheet%3A~A"
+           (subseq doc-id 12))
+   :content-type "text/csv"
+   :content csv))
