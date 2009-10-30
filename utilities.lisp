@@ -41,17 +41,23 @@
          (values doc status headers puri stream flag msg))))))
 
 (defun google-api-request (service url &rest args)
+  (unless (google-api-authentication-header-value service)
+    (error "No authentication for service ~S" service))
   (multiple-value-bind (doc status-code headers puri stream flag status-msg)
       (apply #'drakma:http-request url :additional-headers `(("GData-Version" . "2.0")
-                                                         ("Authorization" . ,(google-api-authentication-header-value service)))
+                                                             ("Authorization" . ,(google-api-authentication-header-value service)))
          args)
     (unless (eq 200 status-code)
-      (error "Bad result for api request ~S ~S ~S ~S ~S ~S ~S"
-             doc status-code headers puri stream flag status-msg))))
+      (format *error-output* "Bad result for api request ~S ~S ~S ~S ~S ~S ~S"
+             doc status-code headers puri stream flag status-msg)
+      (cerror "return bad values" "bad result"))
+    (values doc status-code headers puri stream flag status-msg)))
+
 
 (defun google-docs-full ()
   (cxml:parse 
-   (google-api-request :docs "http://docs.google.com/feeds/default/private/full")
+   (google-api-request :docs #+nil "http://docs.google.com/feeds/default/private/full"
+                       "http://docs.google.com/feeds/documents/private/full")
    (cxml-xmls:make-xmls-builder)))
 
 (defun google-fetch-csv (doc-id)
