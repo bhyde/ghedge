@@ -1,1 +1,8 @@
 I needed to push and pull from Google Spreadsheets, so you get this.
+
+If you want to add this to your clbuild kit you need to add approprate
+junk to wnpp-projects and depenendcies.  For example:
+
+  echo 'ghedge         get_git git://github.com/bhyde/ghedge.git # gdocs spreadsheet tools' >> wnpp-projects
+  echo 'ghedge ' >> dependencies
+
